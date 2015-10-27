@@ -106,7 +106,7 @@ void Message::put32bits(char*& buffer, ulong value) throw () {
 
     buffer[0] = (value & 0xFF000000) >> 24;
     buffer[1] = (value & 0xFF0000) >> 16;
-    buffer[2] = (value & 0xFF00) >> 16;
-    buffer[3] = (value & 0xFF) >> 16;
+    buffer[2] = (value & 0xFF00) >> 8;
+    buffer[3] = (value & 0xFF);
     buffer += 4;
 }

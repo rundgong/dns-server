@@ -9,6 +9,7 @@
 #define	_DNS_RESPONSE_H
 
 #include "message.h"
+#include "stdint.h"
 
 namespace dns {
 /**
@@ -22,6 +23,8 @@ public:
      */
     enum Code { Ok=0, FormatError, ServerFailure, NameError,
                 NotImplemented, Refused };
+
+    enum DnsType { DNS_A=0x01, DNS_PTR=0x0C };
 
     /**
      *  Constructor.
@@ -70,6 +73,7 @@ private:
     std::string m_rdata;
 
     void code_domain(char*& buffer, const std::string& domain) throw();
+    uint32_t code_ipAddress(const std::string& ipAddr) throw();
 };
 }
 #endif	/* _DNS_RESPONSE_H */

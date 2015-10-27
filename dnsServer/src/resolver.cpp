@@ -119,10 +119,10 @@ void Resolver::print_records() throw() {
     cout << endl;
 }
 
-const string Resolver::find(const std::string& ipAddress) throw () {
+const string Resolver::findIpAddress(const std::string& ipAddress) throw () {
 
     Logger& logger = Logger::instance();
-    string text("Resolver::find() | ipAddres: ");
+    string text("Resolver::findIpAddress() | ipAddres: ");
     text += ipAddress;
 
     string domainName;
@@ -145,6 +145,32 @@ const string Resolver::find(const std::string& ipAddress) throw () {
     return domainName;
 }
 
+const string Resolver::findHostName(const std::string& hostName) throw () {
+
+    Logger& logger = Logger::instance();
+    string text("Resolver::findHostName() | hostName: ");
+    text += hostName;
+
+    string ipAddress;
+
+    Record* record = m_record_list;
+    while (record != 0) {
+
+        if (record->domainName == hostName) {
+
+            ipAddress = record->ipAddress;
+            break;
+        }
+        record = record->next;
+    }
+
+    text += " ---> ";
+    text += ipAddress;
+    logger.trace(text);
+
+    return ipAddress;
+}
+
 void Resolver::process(const Query& query, Response& response) throw () {
 
     Logger& logger = Logger::instance();
@@ -153,8 +179,20 @@ void Resolver::process(const Query& query, Response& response) throw () {
     logger.trace(text);
 
     string qName = query.getQName();
-    string ipAddress = convert(qName);
-    string domainName = find( ipAddress );
+    string queryString;
+    string responseString;
+
+    if( qName.find("in-addr.arpa") != string::npos )
+    {
+        string ipAddress = convert(qName);
+        queryString = ipAddress;
+        responseString = findIpAddress( ipAddress );
+    }
+    else
+    {
+        queryString = qName;
+        responseString = findHostName( queryString );
+    }
 
     response.setID( query.getID() );
     response.setQdCount(1);
@@ -162,20 +200,20 @@ void Resolver::process(const Query& query, Response& response) throw () {
     response.setName( query.getQName() );
     response.setType( query.getQType() );
     response.setClass( query.getQClass() );
-    response.setRdata(domainName);
+    response.setRdata(responseString);
 
-    cout << endl << "Query for: " << ipAddress;
+    cout << endl << "Query for: " << queryString;
     cout << endl << "Response with: ";
 
-    if (domainName.empty()) {
+    if (responseString.empty()) {
         cout << "NameError" << endl;
         response.setRCode(Response::NameError);
         response.setRdLength(1); // null label
     }
     else {
-        cout << domainName << endl;
+        cout << responseString << endl;
         response.setRCode(Response::Ok);
-        response.setRdLength(domainName.size()+2); // + initial label length & null label
+        response.setRdLength(responseString.size()+2); // + initial label length & null label
     }
 
     text = "Resolver::process()";

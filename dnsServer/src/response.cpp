@@ -55,8 +55,17 @@ int Response::code(char* buffer) throw() {
     put16bits(buffer, m_type);
     put16bits(buffer, m_class);
     put32bits(buffer, m_ttl);
-    put16bits(buffer, m_rdLength);
-    code_domain(buffer, m_rdata);
+    if(m_type==DNS_PTR){
+        put16bits(buffer, m_rdLength);
+        code_domain(buffer, m_rdata);
+    }
+    if(m_type==DNS_A){
+        put16bits(buffer, 4);
+        uint32_t ipAddr = 0;
+        ipAddr = code_ipAddress(m_rdata);
+        cout << "code ip=" << hex << ipAddr << endl;
+        put32bits(buffer, ipAddr);
+    }
     
     int size = buffer - bufferBegin;
     log_buffer(bufferBegin, size);
@@ -86,3 +95,32 @@ void Response::code_domain(char*& buffer, const std::string& domain) throw() {
 
     *buffer++ = 0;
 }
+
+uint32_t Response::code_ipAddress(const std::string& ipAddr) throw() {
+
+    int start(0), end; // indexes
+
+    uint32_t ip = 0;
+    uint8_t byte = 0;
+    string::const_iterator it = ipAddr.begin();
+    while( it != ipAddr.end() )
+    {
+        if( *it == '.' )
+        {
+            ip = (ip << 8) + byte;
+            ++it;
+            byte = 0;
+            continue;
+        }
+
+        byte = 10*byte + (*it - '0');
+
+        ++it;
+    }
+    ip = (ip << 8) + byte;
+
+    cout << "code_ipAddress " << ipAddr << " - " << hex << ip << endl;
+
+    return ip;
+}
+

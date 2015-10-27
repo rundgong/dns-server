@@ -1,0 +1,9 @@
+Makefile.cross was made to build the dns server for Chromecast.
+Since I don't have a toolchain for CC it was built using android toolchain with static linking.
+
+The make file requires the following environment variables
+CROSS_SYSROOT, GNUSTL
+
+You may need to edit the Makefile.cross for your environment.
+
+To build, run "make -f Makefile.cross"

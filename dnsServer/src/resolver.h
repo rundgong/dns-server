@@ -120,11 +120,19 @@ protected:
     std::string convert(const std::string& domain) throw();
 
     /**
-     *  Finds in the list the domanin corresponding to the ipAddress
+     *  Finds in the list the domain corresponding to the ipAddress
      *  @param ipAddress IP addrress in dot notation
      *  @return The domain name found. An empty string if no domain was found.
      */
-    const std::string find(const std::string& ipAddress) throw ();
+    const std::string findIpAddress(const std::string& ipAddress) throw ();
+
+    /**
+     *  Finds in the list the ip address corresponding to the host name
+     *  @param hostName IP addrress in dot notation
+     *  @return The ip address found. An empty string if no ip address was found.
+     */
+    const std::string findHostName(const std::string& hostName) throw ();
+
 };
 }
 #endif	/* _DNS_RESOLVER_H */
